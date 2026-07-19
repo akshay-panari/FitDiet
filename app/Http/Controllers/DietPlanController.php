@@ -75,23 +75,55 @@ class DietPlanController extends Controller
             'status' => 'required|in:active,completed',
         ]);
 
-        // Calculate the date offset
-        $originalStartDate = $diet_plan->start_date;
-        $newStartDate = \Carbon\Carbon::parse($validated['start_date']);
-        $offsetDays = $originalStartDate->diffInDays($newStartDate);
+        // Store the original days with their meals to preserve them
+        $originalDays = $diet_plan->dietPlanDays->map(function($day) {
+            return [
+                'original_date' => $day->date,
+                'day_name' => $day->day_name,
+                'meals' => $day->meals->map(function($meal) {
+                    return [
+                        'time' => $meal->time,
+                        'meal_title' => $meal->meal_title,
+                        'description' => $meal->description,
+                        'remark' => $meal->remark,
+                    ];
+                })->toArray(),
+            ];
+        })->toArray();
 
         // Update the diet plan
         $diet_plan->update($validated);
 
-        // Shift all internal day dates by the same offset
+        // Delete all existing days to avoid unique constraint violations
+        DietPlanDay::where('diet_plan_id', $diet_plan->id)->delete();
+
+        // Recreate days with new dates and preserve meals
+        $currentDate = $diet_plan->start_date->copy();
         $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         
-        foreach ($diet_plan->dietPlanDays as $day) {
-            $newDate = $day->date->copy()->addDays($offsetDays);
-            $day->update([
+        foreach ($originalDays as $index => $originalDay) {
+            $newDate = $currentDate->copy();
+            $newDayName = $dayNames[$newDate->dayOfWeekIso - 1];
+            
+            // Create the new day
+            $newDay = DietPlanDay::create([
+                'diet_plan_id' => $diet_plan->id,
                 'date' => $newDate,
-                'day_name' => $dayNames[$newDate->dayOfWeekIso - 1],
+                'day_name' => $newDayName,
             ]);
+
+            // Recreate meals for this day
+            foreach ($originalDay['meals'] as $mealData) {
+                DietPlanMeal::create([
+                    'diet_plan_day_id' => $newDay->id,
+                    'time' => $mealData['time'],
+                    'meal_title' => $mealData['meal_title'],
+                    'description' => $mealData['description'],
+                    'remark' => $mealData['remark'],
+                ]);
+            }
+
+            $currentDate->addDay();
         }
 
         return redirect()->route('diet-plans.show', $diet_plan)
