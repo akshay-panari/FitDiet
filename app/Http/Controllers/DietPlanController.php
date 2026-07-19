@@ -75,10 +75,27 @@ class DietPlanController extends Controller
             'status' => 'required|in:active,completed',
         ]);
 
+        // Calculate the date offset
+        $originalStartDate = $diet_plan->start_date;
+        $newStartDate = \Carbon\Carbon::parse($validated['start_date']);
+        $offsetDays = $originalStartDate->diffInDays($newStartDate);
+
+        // Update the diet plan
         $diet_plan->update($validated);
 
+        // Shift all internal day dates by the same offset
+        $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        
+        foreach ($diet_plan->dietPlanDays as $day) {
+            $newDate = $day->date->copy()->addDays($offsetDays);
+            $day->update([
+                'date' => $newDate,
+                'day_name' => $dayNames[$newDate->dayOfWeekIso - 1],
+            ]);
+        }
+
         return redirect()->route('diet-plans.show', $diet_plan)
-            ->with('success', 'Diet plan updated successfully.');
+            ->with('success', 'Diet plan updated successfully. Internal day dates have been adjusted.');
     }
 
     public function destroy(DietPlan $diet_plan)
