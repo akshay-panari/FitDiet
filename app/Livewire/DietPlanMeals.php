@@ -15,6 +15,10 @@ class DietPlanMeals extends Component
     public $mealTemplates;
     public $selectedDayId;
     public $showAddMeal = false;
+    public $showEditMeal = false;
+    public $showEditDay = false;
+    public $editingMealId = null;
+    public $editingDayId = null;
     
     // Form fields
     public $time;
@@ -22,12 +26,14 @@ class DietPlanMeals extends Component
     public $description;
     public $remark;
     public $selectedTemplate = '';
+    public $day_date;
 
     protected $rules = [
         'time' => 'required|date_format:H:i',
         'description' => 'required|string',
         'meal_title' => 'nullable|string|max:255',
         'remark' => 'nullable|string',
+        'day_date' => 'required|date',
     ];
 
     public function mount(DietPlan $dietPlan)
@@ -53,6 +59,72 @@ class DietPlanMeals extends Component
     {
         $this->showAddMeal = false;
         $this->resetForm();
+    }
+
+    public function showEditMealForm($mealId)
+    {
+        $meal = DietPlanMeal::find($mealId);
+        if ($meal) {
+            $this->editingMealId = $mealId;
+            $this->time = $meal->time->format('H:i');
+            $this->meal_title = $meal->meal_title;
+            $this->description = $meal->description;
+            $this->remark = $meal->remark;
+            $this->selectedTemplate = '';
+            $this->showEditMeal = true;
+        }
+    }
+
+    public function hideEditMealForm()
+    {
+        $this->showEditMeal = false;
+        $this->editingMealId = null;
+        $this->resetForm();
+    }
+
+    public function showEditDayForm($dayId)
+    {
+        $day = DietPlanDay::find($dayId);
+        if ($day) {
+            $this->editingDayId = $dayId;
+            $this->day_date = $day->date->format('Y-m-d');
+            $this->showEditDay = true;
+        }
+    }
+
+    public function hideEditDayForm()
+    {
+        $this->showEditDay = false;
+        $this->editingDayId = null;
+        $this->day_date = '';
+    }
+
+    public function updateDay()
+    {
+        $this->validate([
+            'day_date' => 'required|date',
+        ]);
+
+        $day = DietPlanDay::find($this->editingDayId);
+        if ($day) {
+            // Calculate day name from date
+            $date = \Carbon\Carbon::parse($this->day_date);
+            $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $calculatedDayName = $dayNames[$date->dayOfWeekIso - 1];
+
+            $day->update([
+                'date' => $this->day_date,
+                'day_name' => $calculatedDayName,
+            ]);
+
+            $this->hideEditDayForm();
+            
+            // Refresh the diet plan data
+            $this->dietPlan->refresh();
+            $this->dietPlanDays = $this->dietPlan->dietPlanDays->sortBy('date');
+            
+            $this->dispatch('dayUpdated');
+        }
     }
 
     public function selectTemplate($templateId)
@@ -95,6 +167,29 @@ class DietPlanMeals extends Component
             $meal->delete();
             $this->dietPlan->refresh();
             $this->dietPlanDays = $this->dietPlan->dietPlanDays->sortBy('date');
+        }
+    }
+
+    public function updateMeal()
+    {
+        $this->validate();
+
+        $meal = DietPlanMeal::find($this->editingMealId);
+        if ($meal) {
+            $meal->update([
+                'time' => $this->time,
+                'meal_title' => $this->meal_title,
+                'description' => $this->description,
+                'remark' => $this->remark,
+            ]);
+
+            $this->hideEditMealForm();
+            
+            // Refresh the diet plan data
+            $this->dietPlan->refresh();
+            $this->dietPlanDays = $this->dietPlan->dietPlanDays->sortBy('date');
+            
+            $this->dispatch('mealUpdated');
         }
     }
 
