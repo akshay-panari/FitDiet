@@ -13,6 +13,8 @@ class DietPlanMeal extends Model
         'meal_title',
         'description',
         'remark',
+        'meal_template_id',
+        'meal_sub_template_id',
     ];
 
     protected $casts = [
@@ -27,5 +29,15 @@ class DietPlanMeal extends Model
     public function dietPlan(): BelongsTo
     {
         return $this->dietPlanDay->dietPlan;
+    }
+
+    public function mealTemplate(): BelongsTo
+    {
+        return $this->belongsTo(MealTemplate::class);
+    }
+
+    public function mealSubTemplate(): BelongsTo
+    {
+        return $this->belongsTo(MealSubTemplate::class);
     }
 }

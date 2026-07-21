@@ -150,6 +150,7 @@ class DietPlanMeals extends Component
         if ($subTemplate) {
             $this->selectedSubTemplate = $subTemplateId;
             $this->time = $subTemplate->time ? $subTemplate->time->format('H:i') : '';
+            $this->meal_title = $subTemplate->name;
             $this->description = $subTemplate->description;
             $this->remark = $subTemplate->default_remark;
         }
@@ -167,6 +168,8 @@ class DietPlanMeals extends Component
             'meal_title' => $this->meal_title,
             'description' => $this->description,
             'remark' => $this->remark,
+            'meal_template_id' => $this->selectedTemplate ?: null,
+            'meal_sub_template_id' => $this->selectedSubTemplate ?: null,
         ]);
 
         $this->hideAddMealForm();

@@ -37,8 +37,10 @@
             @if($day->meals->count() > 0)
                 @foreach ($day->meals->sortBy('time') as $meal)
                     <div class="meal">
-                        <strong>{{ $meal->time ? $meal->time->format('H:i') : 'N/A' }}</strong> 
-                        @if($meal->meal_title) - {{ $meal->meal_title }} @endif
+                        <strong>{{ $meal->time ? $meal->time->format('H:i') : 'N/A' }}</strong>
+                        @if($meal->mealTemplate) - {{ $meal->mealTemplate->name }} @endif
+                        
+                        @if($meal->mealSubTemplate)<br>{{ $meal->mealSubTemplate->name }}@endif
                         <br>{{ $meal->description }}
                         @if($meal->remark)<br><em>Note: {{ $meal->remark }}</em>@endif
                     </div>

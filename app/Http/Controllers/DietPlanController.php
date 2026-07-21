@@ -86,6 +86,8 @@ class DietPlanController extends Controller
                         'meal_title' => $meal->meal_title,
                         'description' => $meal->description,
                         'remark' => $meal->remark,
+                        'meal_template_id' => $meal->meal_template_id,
+                        'meal_sub_template_id' => $meal->meal_sub_template_id,
                     ];
                 })->toArray(),
             ];
@@ -120,6 +122,8 @@ class DietPlanController extends Controller
                     'meal_title' => $mealData['meal_title'],
                     'description' => $mealData['description'],
                     'remark' => $mealData['remark'],
+                    'meal_template_id' => $mealData['meal_template_id'],
+                    'meal_sub_template_id' => $mealData['meal_sub_template_id'],
                 ]);
             }
 
