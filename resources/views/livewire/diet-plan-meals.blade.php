@@ -96,6 +96,20 @@
                                 </div>
                             @endif
 
+                            <!-- Sub-Template Selection -->
+                            @if($selectedTemplate && count($subTemplates) > 0)
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Select Sub-Template (Optional)</label>
+                                    <select wire:model="selectedSubTemplate" wire:change="selectSubTemplate(selectedSubTemplate)"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Select a sub-template...</option>
+                                        @foreach ($subTemplates as $subTemplate)
+                                            <option value="{{ $subTemplate->id }}">{{ $subTemplate->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Time</label>
                                 <input type="time" wire:model="time" required
@@ -170,6 +184,20 @@
                                         <option value="">Select a template...</option>
                                         @foreach ($mealTemplates as $template)
                                             <option value="{{ $template->id }}">{{ $template->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <!-- Sub-Template Selection -->
+                            @if($selectedTemplate && count($subTemplates) > 0)
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Select Sub-Template (Optional)</label>
+                                    <select wire:model="selectedSubTemplate" wire:change="selectSubTemplate(selectedSubTemplate)"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Select a sub-template...</option>
+                                        @foreach ($subTemplates as $subTemplate)
+                                            <option value="{{ $subTemplate->id }}">{{ $subTemplate->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

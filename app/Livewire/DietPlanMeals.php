@@ -7,6 +7,7 @@ use App\Models\DietPlan;
 use App\Models\DietPlanDay;
 use App\Models\DietPlanMeal;
 use App\Models\MealTemplate;
+use App\Models\MealSubTemplate;
 
 class DietPlanMeals extends Component
 {
@@ -26,6 +27,8 @@ class DietPlanMeals extends Component
     public $description;
     public $remark;
     public $selectedTemplate = '';
+    public $selectedSubTemplate = '';
+    public $subTemplates = [];
     public $day_date;
 
     protected $rules = [
@@ -33,7 +36,6 @@ class DietPlanMeals extends Component
         'description' => 'required|string',
         'meal_title' => 'nullable|string|max:255',
         'remark' => 'nullable|string',
-        'day_date' => 'required|date',
     ];
 
     public function mount(DietPlan $dietPlan)
@@ -131,9 +133,25 @@ class DietPlanMeals extends Component
     {
         $template = MealTemplate::find($templateId);
         if ($template) {
-            $this->description = $template->description;
-            $this->remark = $template->default_remark;
             $this->selectedTemplate = $templateId;
+            $this->selectedSubTemplate = '';
+            $this->subTemplates = $template->subTemplates;
+            
+            // Reset meal fields when template changes
+            $this->time = '';
+            $this->description = '';
+            $this->remark = '';
+        }
+    }
+
+    public function selectSubTemplate($subTemplateId)
+    {
+        $subTemplate = MealSubTemplate::find($subTemplateId);
+        if ($subTemplate) {
+            $this->selectedSubTemplate = $subTemplateId;
+            $this->time = $subTemplate->time ? $subTemplate->time->format('H:i') : '';
+            $this->description = $subTemplate->description;
+            $this->remark = $subTemplate->default_remark;
         }
     }
 
@@ -200,5 +218,7 @@ class DietPlanMeals extends Component
         $this->description = '';
         $this->remark = '';
         $this->selectedTemplate = '';
+        $this->selectedSubTemplate = '';
+        $this->subTemplates = [];
     }
 }

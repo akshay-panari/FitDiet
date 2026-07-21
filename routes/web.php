@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DietPlanController;
 use App\Http\Controllers\MealTemplateController;
+use App\Http\Controllers\MealSubTemplateController;
 use App\Http\Controllers\WeightLogController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
     // Meal Templates
     Route::resource('meal-templates', MealTemplateController::class);
+    Route::resource('meal-sub-templates', MealSubTemplateController::class);
 
     // Weight Logs
     Route::resource('weight-logs', WeightLogController::class);

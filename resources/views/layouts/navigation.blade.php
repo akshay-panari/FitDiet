@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('meal-templates.index')" :active="request()->routeIs('meal-templates.*')">
                         {{ __('Meal Templates') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('meal-sub-templates.index')" :active="request()->routeIs('meal-sub-templates.*')">
+                        {{ __('Sub-Templates') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('weight-logs.index')" :active="request()->routeIs('weight-logs.*')">
                         {{ __('Weight Logs') }}
                     </x-nav-link>
@@ -90,6 +93,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('meal-templates.index')" :active="request()->routeIs('meal-templates.*')">
                 {{ __('Meal Templates') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('meal-sub-templates.index')" :active="request()->routeIs('meal-sub-templates.*')">
+                {{ __('Sub-Templates') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('weight-logs.index')" :active="request()->routeIs('weight-logs.*')">
                 {{ __('Weight Logs') }}

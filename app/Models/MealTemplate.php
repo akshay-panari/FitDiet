@@ -11,4 +11,9 @@ class MealTemplate extends Model
         'description',
         'default_remark',
     ];
+
+    public function subTemplates()
+    {
+        return $this->hasMany(MealSubTemplate::class);
+    }
 }
